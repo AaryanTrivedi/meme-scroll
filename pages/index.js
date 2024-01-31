@@ -32,6 +32,24 @@ const Home = ({ initialPosts, initialAfter }) => {
     );
   };
 
+  const loadMemes = async () => {
+    try {
+      const response = await axios.get('https://www.reddit.com/r/memes.json?limit=100');
+      const data = response.data;
+
+      const newPosts = data.data.children.map((child, index) => ({
+        ...child.data,
+        key: `post-${index + 1}`,
+      }));
+      const newAfter = data.data.after;
+
+      setPosts(newPosts);
+      setAfter(newAfter);
+    } catch (error) {
+      console.error('Error fetching Reddit data:', error);
+    }
+  };
+
   const loadMore = async () => {
     if (loadingMore) return;
 
@@ -60,12 +78,13 @@ const Home = ({ initialPosts, initialAfter }) => {
   };
 
   useEffect(() => {
+    loadMemes();
     window.addEventListener('scroll', handleScroll);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [after]);
+  }, []);
 
   const handleScroll = () => {
     const threshold = 100;
@@ -99,27 +118,5 @@ const Home = ({ initialPosts, initialAfter }) => {
     </Fragment>
   );
 };
-
-export async function getServerSideProps() {
-  try {
-    const response = await axios.get('https://www.reddit.com/r/memes.json?limit=100');
-    const data = response.data;
-
-    const initialPosts = data.data.children.map((child, index) => ({
-      ...child.data,
-      key: `post-${index + 1}`,
-    }));
-    const initialAfter = data.data.after;
-
-    return {
-      props: { initialPosts, initialAfter },
-    };
-  } catch (error) {
-    console.error('Error fetching Reddit data:', error);
-    return {
-      props: { initialPosts: [], initialAfter: null },
-    };
-  }
-}
 
 export default Home;
