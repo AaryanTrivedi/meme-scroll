@@ -28,7 +28,7 @@ const Modal = ({ selectedImage, closeImage, posts, currentIndex, setCurrentIndex
           </button>
         )}
         <button className={styles.close} onClick={closeImage}>
-          X
+          &times;
         </button>
         {nextButtonVisible && (
           <button className={styles.navButton} onClick={goToNext}>
